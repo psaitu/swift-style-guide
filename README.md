@@ -19,6 +19,39 @@ Vertical spaces should be used in long methods to separate its name from impleme
 
 Use comments to describe why is something written as it is, or work as it works. Remember that code should be self-documenting, so use comments only if necessary. If you decide to add a comments, keep them up-to-date. Comments that was not maintained should be deleted.
 
+## Code organization:
+
+Preferable code organization within a file:
+
+```swift
+class Wallet {
+    
+    private(set) var cash: Double
+    let cards: [Card]?
+    
+    private personID: Identification
+    
+    init(cash: Double, cards: [Card], identification: Identification) {
+        self.cash = cash
+        self.cards = cards
+        personID = identification
+    }
+    
+    func canAffordTransaction(transaction: Transaction) -> Bool
+    
+    private func cardForCashAmount(amount: Double) -> Card
+}
+
+extension Wallet: Printable {
+    
+    var description: String {
+        return personID.firstName + " " + personID.lastName + " has " + String(cash)
+    }
+}
+```
+
+This organization helps other programmers read what is important first. It saves time, confusion and improves readability.
+
 ## General naming:
 
 Names of `class`, `struct`, `enum`, enums cases, `typealias`, `protocol` and generic types’ names should be capitalized. Moreover, generic types’ names should preferably start with `T` letter, then `U`, `V` and so on. 
