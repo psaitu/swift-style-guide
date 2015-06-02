@@ -41,9 +41,9 @@ class Wallet {
     
     private func cardForCashAmount(amount: Double) -> Card
 }
-
-extension Wallet: Printable {
     
+extension Wallet: Printable {
+
     var description: String {
         return personID.firstName + " " + personID.lastName + " has " + String(cash)
     }
@@ -123,9 +123,8 @@ Types should be inferred, don’t duplicate type identifier if it can be resolve
 
 ```swift
 let name = “text”
-let guides = [Guide]()
-let addressBook = [String: String]()
-var delegate: UITableViewDelegate?
+var guides = [Guide]()
+var addressBook = [String: String]()
 ```
 
 Not preferred:
@@ -134,7 +133,6 @@ Not preferred:
 let name: String = "text"
 let guides: [Guide] = []
 let addressBook: [String: String] = [:]
-var delegate: UITableViewDelegate?
 ```
 
 Also associate colon with type identifier.
@@ -173,9 +171,7 @@ Force-unwrapping should be avoid, because it leads to less safer code and can ca
 ```swift
 let result: Result<String>?
 
-if let result = result {
-    result.print()
-}
+result?.print()
 ```
 
 instead of:
@@ -374,6 +370,4 @@ Remember that inheritance is not a good reason to use `class`, try with `protoco
 
 Semicolons are obfuscating and they should never be used. Statements can be separated by dropping each one to separate lines.
 
-Rewriting Swift standard library functionalities should never take place. Your code probably won’t be faster and can be confusing to other developers. 
-
-
+Rewriting Swift standard library functionalities should never take place. Your code probably won’t be faster and can be confusing to other developers.
