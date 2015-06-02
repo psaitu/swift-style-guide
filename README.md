@@ -5,21 +5,39 @@ This guide is based on the following sources:
 - [Github Swift style guide](https://github.com/github/swift-style-guide)
 - [Ray Wenderlich Swift style guide](https://github.com/raywenderlich/swift-style-guide)
 
-## Purpose of the style guide:
+## Purpose of the style guide
 
-This guide should help you improve your Swift code style, its readability, consistency and simplicity. The guide is not a manifest, it doesn’t tell you what to do (except some parts when it tells what not to do). It is a set of hints about subjectively good style and practices that might help you and your team decrease number of programmers errors. 
+This guide should help you improve your Swift code style, its readability, consistency and simplicity. The guide is not a manifest, it doesn’t tell you what to do (except some parts when it tells what not to do). It is a set of hints about subjectively good style and practices that might help you and your team decrease number of programmers errors.
 
-## Spacing:
+## Table of contents
+
+* [Spacing](#spacing)
+* [Comments](#comments)
+* [Code organization](#code-organization)
+* [General naming](#general-naming)
+* [Functions naming and arguments](#functions-naming-and-arguments)
+* [Closures](#closures)
+* [Types](#types)
+* [Mutability - let vs var](#mutability---let-vs-var)
+* [Optionals](#optionals)
+* [Static vs Dynamic](#static-vs-dynamic)
+* [Implicit getters on read-only computed properties and subscripts](https://github.com/netguru/swift-style-guide#implicit-getters-on-read-only-computed-properties-and-subscripts)
+* [Specify access control](#specify-access-control)
+* [Refer to self only when it’s required and necessary](#refer-to-self-only-when-its-required-and-necessary)
+* [Value semantics over reference semantics](#value-semantics-over-reference-semantics)
+* [Forbidden](#forbidden)
+
+## Spacing
 
 Indent code with tabs, not spaces. Remember about ending file with new line. 
 
 Vertical spaces should be used in long methods to separate its name from implementation, what improves readability. You also may want to use vertical spaces to separate sub responsibilities within a function. Shorter methods (one or two lines) don’t need such spacing.
 
-## Comments:
+## Comments
 
 Use comments to describe why is something written as it is, or work as it works. Remember that code should be self-documenting, so use comments only if necessary. If you decide to add a comments, keep them up-to-date. Comments that was not maintained should be deleted.
 
-## Code organization:
+## Code organization
 
 Preferable code organization within a file:
 
@@ -52,7 +70,7 @@ extension Wallet: Printable {
 
 This organization helps other programmers read what is important first. It saves time, confusion and improves readability.
 
-## General naming:
+## General naming
 
 Names of `class`, `struct`, `enum`, enums cases, `typealias`, `protocol` and generic types’ names should be capitalized. Moreover, generic types’ names should preferably start with `T` letter, then `U`, `V` and so on. 
 
@@ -60,7 +78,7 @@ All names should be written in camel case manner and should be meaningful and co
 
 It is strongly misadvised to name `class`, `struct`, etc.mon with keywords like `Manager`, `Helper` or `Utility`, because they’re meaningless and its role can be easily misunderstood.
 
-## Functions naming and arguments:
+## Functions naming and arguments
 
 Functions names should be as much descriptive and meaningful as possible. Try to express the intent of a function in its name keeping it compact at the same time. 
 
@@ -82,7 +100,7 @@ Use default values for arguments in situations when function expects any value, 
 func describe(#operation: Operation, includingOperationError error: NSError? = nil) -> String
 ```
 
-## Closures:
+## Closures
 
 Trailing closures should be added after parenthesis of a function. If function doesn’t take any arguments besides closure, parenthesis can be omitted and closure can be added right after function name. Unused closure arguments should be replaced with `_`. Parameters types should be omitted.
 
@@ -158,13 +176,13 @@ struct Item {
 ```
 
 
-## Mutability - `let` vs `var`:
+## Mutability - `let` vs `var`
 
 It’s safer to assume that values are immutable, thus it’s highly recommended to declare values with `let`. Immutable values assures the state of a value what in consequence result in less error prone code. 
 
 `var` can be used only if their necessary, for example you are absolutely sure value will change in the future.
 
-## Optionals:
+## Optionals
 
 Force-unwrapping should be avoid, because it leads to less safer code and can cause unwanted crashes.
 
@@ -234,7 +252,7 @@ Functions should have optional return type if they may return `nil`.
 func annotationOfType(type: AnnotationType) -> Annotation?
 ```
 
-## Static vs Dynamic:
+## Static vs Dynamic
 
 Static code is a code which state can be resolved in compile time. Swift compiler is able to optimize code that it knows how will work before executing it. Try make use of this feature and write as much static code as it can be, so it will perform better.
 
@@ -293,9 +311,9 @@ class Exponential: Generator {
 }
 ```
 
-Please take a look at **Value semantics over reference semantics** section too.
+Please take a look at [Value semantics over reference semantics](#value-semantics-over-reference-semantics) section too.
 
-## Implicit getters on read-only computed properties and subscripts:
+## Implicit getters on read-only computed properties and subscripts
 
 Read-only computed properties doesn’t need to have getter defined explicitly. It can be omitted. This also applies to read-only subscripts:
 
@@ -310,7 +328,7 @@ class Person {
 }
 ```
 
-## Specify access control:
+## Specify access control
 
 Access control should be specified on a top-level of scope:
 
@@ -336,7 +354,7 @@ internal extension Person {
 }
 ```
 
-## Refer to self only when it’s required and necessary:
+## Refer to self only when it’s required and necessary
 
 Refer to self only in closures or when context requires it:
 
@@ -352,7 +370,7 @@ init(title: String) {
 }
 ```
 
-## Value semantics over reference semantics:
+## Value semantics over reference semantics
 
 Value types are structs, enums and tuples. They are usually simpler than reference types and they are always being copied on assignment, when passing as arguments or in initialization. This means that values are independent instances what makes code simpler and safer, because they can’t be changed by other part of the app, like some other thread. Also let and var keywords work as expected.
 
@@ -364,7 +382,7 @@ Object types are great to represent **behavior** in the app.
 
 Remember that inheritance is not a good reason to use `class`, try with `protocol` instead (composition).
 
-## Forbidden:
+## Forbidden
 
 `Class`, `struct`, `enum`, functions and typealiases should never have prefixes, because they are automatically prefixed by the name of module they’re contained in.
 
