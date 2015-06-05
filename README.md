@@ -75,9 +75,9 @@ Such organization helps others to reach important content earlier. It saves time
 
 Names of classes, structs, enums, enum cases, typealiases, protocols and generic types should be capitalized. Generic types' names should start with letter `T`, when `U`, `V` and so on.
 
-Names should be meaningful and compact, written in camel case manner. Try to ask yourself whether the name of a type sufficiently explains its behavior. Meaningful naming is very important to other developers, because they define some expectations about their own roles.
+Names should be meaningful and compact, written in camel case manner. Try to ask yourself whether the name of a type sufficiently explains its behavior. Meaningful naming is very important to other developers because they define some expectations about their own roles.
 
-It is strongly misadvised to name suffix your types with words like `Manager`, `Helper` or `Utility`, because they're meaningless and their role can be easily misinterpreted.
+It is strongly misadvised to name suffix your types with words like `Manager`, `Helper` or `Utility` because they're meaningless and their role can be easily misinterpreted.
 
 ## Function and argument naming
 
@@ -198,7 +198,7 @@ struct Item {
 
 ## Mutability – `let` vs `var`
 
-It's safer to assume that a variable is immutable, this it's highly recommended to declare values as constants, using `let`. Immutable constants ensure their values will never change, which results in less error-prone code.
+It's safer to assume that a variable is immutable, thus it's highly recommended to declare values as constants, using `let`. Immutable constants ensure their values will never change, which results in less error-prone code.
 
 Mutable `var` variables should only be used when necessary, e.g. when you're absolutely sure you will be changing their values in the future.
 
