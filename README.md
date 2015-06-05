@@ -1,13 +1,14 @@
 # The Swift Style Guide
 
 This guide is based on the following sources:
-- [The Swift Programming Language](https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/TheBasics.html#//apple_ref/doc/uid/TP40014097-CH5-ID309)
+
+- [The Swift Programming Language](https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language)
 - [Github Swift style guide](https://github.com/github/swift-style-guide)
 - [Ray Wenderlich Swift style guide](https://github.com/raywenderlich/swift-style-guide)
 
 ## Purpose of the style guide
 
-This guide should help you improve your Swift code style, its readability, consistency and simplicity. The guide is not a manifest, it doesn’t tell you what to do (except some parts when it tells what not to do). It is a set of hints about subjectively good style and practices that might help you and your team decrease number of programmers errors.
+This guide should help you to improve your Swift code style, its readability, consistency and simplicity. It's not a manifest, it doesn’t tell you what to do (though sometimes it may tell you what not to do). It's a set of hints about subjectively best practices that might help you and your team decrease number of programmers errors.
 
 ## Table of contents
 
@@ -29,13 +30,13 @@ This guide should help you improve your Swift code style, its readability, consi
 
 ## Spacing
 
-Indent code with tabs, not spaces. Remember about ending file with new line. 
+Indent code with tabs, not spaces. Remember about ending file with new line.
 
-Vertical spaces should be used in long methods to separate its name from implementation, what improves readability. You also may want to use vertical spaces to separate sub responsibilities within a function. Shorter methods (one or two lines) don’t need such spacing.
+Vertical spaces should be used in long methods to separate its name from implementation, what improves readability. You may also want to use vertical spaces to separate logic within a function. Shorter methods (one or two lines) don't need such spacing.
 
 ## Comments
 
-Use comments to describe why is something written as it is, or work as it works. Remember that code should be self-documenting, so use comments only if necessary. If you decide to add a comments, keep them up-to-date. Comments that was not maintained should be deleted.
+Use comments to describe why something is written as it is, or working like it does. Remember that code should be self-documenting, so use comments only if necessary. If you decide to add comments, keep them up-to-date. Unmaintained comments should be removed.
 
 ## Code organization
 
@@ -68,33 +69,35 @@ extension Wallet: Printable {
 }
 ```
 
-This organization helps other programmers read what is important first. It saves time, confusion and improves readability.
+Such organization helps others to reach important content earlier. It saves time, confusion and improves readability.
 
 ## General naming
 
-Names of `class`, `struct`, `enum`, enums cases, `typealias`, `protocol` and generic types’ names should be capitalized. Moreover, generic types’ names should preferably start with `T` letter, then `U`, `V` and so on. 
+Names of classes, structs, enums, enum cases, typealiases, protocols and generic types should be capitalized. Generic types' names should start with letter `T`, when `U`, `V` and so on.
 
-All names should be written in camel case manner and should be meaningful and compact. Try to ask yourself if name explains the behavior or role of class, struct etc. Correct naming is very important for other people working with your code, because it defines some expectations about it. 
+Names should be meaningful and compact, written in camel case manner. Try to ask yourself whether the name of a type sufficiently explains its behavior. Meaningful naming is very important to other developers, because they define some expectations about their own roles.
 
-It is strongly misadvised to name `class`, `struct`, etc.mon with keywords like `Manager`, `Helper` or `Utility`, because they’re meaningless and its role can be easily misunderstood.
+It is strongly misadvised to name suffix your types with words like `Manager`, `Helper` or `Utility`, because they're meaningless and their role can be easily misinterpreted.
 
-## Functions naming and arguments
+## Function and argument naming
 
-Functions names should be as much descriptive and meaningful as possible. Try to express the intent of a function in its name keeping it compact at the same time. 
+Function names should be as descriptive and meaningful as possible. Try to express its intent in the name, by keeping it compact at the same time.
 
-Functions’ arguments should be descriptive. Remember that you can use shorter arguments names to use in function implementation while in invocation they can be more meaningful for user. The first argument’s name can be a part of a function name:
+Arguments should also be descriptive. Remember that you can use argument labels, which may be more meaningful to a user.
+
+The first argument's name can be a part of the function's name:
 
 ```swift
 func convertPoint(point: CGPoint, toCoordinateSystem system: CoordinateSystem) -> CGPoint
 ```
 
-or its name can be explicitly required:
+Or its label can be explicitly required:
 
 ```swift
 func convert(#point: CGPoint, toCoordinateSystem system: CoordinateSystem) -> CGPoint
 ```
 
-Use default values for arguments in situations when function expects any value, so it can be omitted, or most of the time argument would have some specific value. If function doesn’t require a particular value in argument, it is good to make this argument optional and make it implicitly `nil`.
+Use default values for arguments where a function expects any value or some specific value most of the time. If a particular argument is not required for a function, it's good to make it optional and `nil` by default.
 
 ```swift
 func describe(#operation: Operation, includingOperationError error: NSError? = nil) -> String
@@ -102,17 +105,19 @@ func describe(#operation: Operation, includingOperationError error: NSError? = n
 
 ## Closures
 
-Trailing closures should be added after parenthesis of a function. If function doesn’t take any arguments besides closure, parenthesis can be omitted and closure can be added right after function name. Unused closure arguments should be replaced with `_`. Parameters types should be omitted.
+If the last argument of a function is a closure, use trailing closure syntax. 
+
+Trailing closure syntax should be used if a function accepts a closure as its last argument. If it's its only argument, parentheses may be ommited. Unused closure arguments should be replaced with `_` (or fully ommited if no arguments are used). Argument types should be inferred.
 
 ```swift
-func perform(#operation: Operation, completion: (Bool) -> Void)
+func perform<T>(#operation: Operation<T>, completion: (T, NSError) -> Void)
 
-perform(#operation: operation) { _ in
+perform(#operation: operation) { (result, _) in
     ...
 }
 ```
 
-When context of a closure is clear, implicit return can be applied.
+Use implicit `return` in one-line closures with clear context.
 
 ```swift
 let users: [User] = ...
@@ -120,42 +125,60 @@ let users: [User] = ...
 users.filter { $0.name != nil }
 ```
 
-Remember that functions can be used in the same way as closures and sometimes it is convenient to pass function as a closure.
+Also, remember that global functions are closures and sometimes it's convenient to pass a function name as a closure:
+
+```swift
+func isPositive(number: Int) -> Bool {
+    return number > 0
+}
+
+let numbers = [-1, 2, 3, -4]
+
+let positive = numbers.filter(isPositive) // [2, 3]
+```
 
 ## Types
 
-Try to use native types before you will come up with your one. Every type in Swift can be extended, so instead of introducing new types it is convenient to try to extend existing ones. 
+Try to use native Swift types before you come up with your own. Every type can be extended, so sometimes instead of introducing new types, it's convenient to extend or alias existing ones.
 
-Remember that Objective-C classes that has their native equivalents in Swift are not automatically bridged. For example, `NSString` won’t be automatically bridged to `String`. You have to be explicit in the type:
+Remember that Objective-C classes that have native Swift equivalents are not automatically bridged, e.g. `NSString` is not implicitly bridged to `String` in the following example:
 
 ```swift
 func inverse(string: String)
 
-let string: NSString = …
+let string: NSString = ...
 
 inverse(string) // compile error
 inverse(string as String) // no error 
 ```
 
-Types should be inferred, don’t duplicate type identifier if it can be resolved in compile time:
+Types should be inferred whenever possible. Don't duplicate type identifier if it can be resolved in compile time:
 
 ```swift
-let name = “text”
+let name = "text"
 var guides = [Guide]()
 var addressBook = [String: String]()
+
+// not preferred
+
+let name: String = "text"
+var guides: [Guide] = []
+var addressBook: [String: String] = [:]
 ```
 
-Not preferred:
+Also, associate colon with type identifier:
 
 ```swift
-let name: String = "text"
-let guides: [Guide] = []
-let addressBook: [String: String] = [:]
+class MyView: UIView
+let color: UIColor
+
+// not preferred
+
+class MyView : UIView
+let color : UIColor
 ```
 
-Also associate colon with type identifier.
-
-Typealiases should be short but meaningful:
+Typealiases should be short and meaningful:
 
 ```swift
 typealias MoneyAmount = Double
@@ -163,11 +186,9 @@ typealias MoneyAmount = Double
 struct Item {
     let price: MoneyAmount
 }
-```
 
-Not preferred:
+// not preferred
 
-```swift
 typealias Money = Double
 
 struct Item {
@@ -175,30 +196,27 @@ struct Item {
 }
 ```
 
+## Mutability – `let` vs `var`
 
-## Mutability - `let` vs `var`
+It's safer to assume that a variable is immutable, this it's highly recommended to declare values as constants, using `let`. Immutable constants ensure their values will never change, which results in less error-prone code.
 
-It’s safer to assume that values are immutable, thus it’s highly recommended to declare values with `let`. Immutable values assures the state of a value what in consequence result in less error prone code. 
-
-`var` can be used only if their necessary, for example you are absolutely sure value will change in the future.
+Mutable `var` variables should only be used when necessary, e.g. when you're absolutely sure you will be changing their values in the future.
 
 ## Optionals
 
-Force-unwrapping should be avoid, because it leads to less safer code and can cause unwanted crashes.
+Force-unwrapping should be avoided because it leads to less safe code and can cause unwanted crashes.
 
 ```swift
 let result: Result<String>?
 
 result?.print()
-```
 
-instead of:
+// not preferred
 
-```swift
 result!.print()
 ```
 
-Implicitly unwrapped optionals should also be avoided, however thay can be useful in applications like unit tests, where the system under test should never be `nil`. There’s no point in executing rest of tests if one of them is written badly, so it actually saves you time. 
+Implicitly unwrapped optionals should also be avoided. However, they can be useful in unit tests, where system under test should never be `nil`. There's no point executing the rest of the tests if one of them is written badly.
 
 ```swift
 var sut: System!
@@ -217,7 +235,7 @@ it ("should be running") {
 }
 ```
 
-Unwrap optional value when it makes sense, for example you will need to make bunch of operations on it. 
+Unwrap optional value when it makes sense, e.g. when you need to make a bunch of operations on it:
 
 ```swift
 var button: UIButton?
@@ -229,13 +247,13 @@ if let button = button {
 }
 ```
 
-Otherwise use optional chaining, because it’s clear and safe:
+Otherwise use optional chaining because it's clear and safe:
 
 ```swift
 button?.backgroundColor = UIColor.blackColor()
 ```
 
-Unwrapping several optionals in nested if statements (pyramid of doom) is forbidden. Swift allows unwrapping of multiple optionals in one if statement:
+Unwrapping several optionals in nested `if-let` statements is forbidden. Swift allows you to unwrap multiple optionals in one statement:
 
 ```swift
 var name: String?
@@ -246,7 +264,7 @@ if let name = name, birthDate = birthDate {
 }
 ```
 
-Functions should have optional return type if they may return `nil`.
+Functions should have optional return type if they may return `nil`:
 
 ```swift
 func annotationOfType(type: AnnotationType) -> Annotation?
