@@ -18,7 +18,7 @@ This guide should help you to improve your Swift code style, its readability, co
 * [Naming](#naming)
 * [Closures](#closures)
 * [Types](#types)
-* [Mutability – `let` over `var`](#mutability---let-over-var)
+* [Mutability – `let` over `var`](#mutability--let-over-var)
 * [Optionals](#optionals)
 * [Static vs dynamic code](#static-vs-dynamic-code)
 * [Implicit getters](#implicit-getters)
