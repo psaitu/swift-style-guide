@@ -6,7 +6,7 @@ This guide is based on the following sources:
 - [Github Swift style guide](https://github.com/github/swift-style-guide)
 - [Ray Wenderlich Swift style guide](https://github.com/raywenderlich/swift-style-guide)
 
-## Purpose of the style guide
+### Purpose of the style guide
 
 This guide should help you to improve your Swift code style, its readability, consistency and simplicity. It's not a manifest, it doesn’t tell you what to do (though sometimes it may tell you what not to do). It's a set of hints about subjectively best practices that might help you and your team decrease number of programmers errors.
 
@@ -15,93 +15,108 @@ This guide should help you to improve your Swift code style, its readability, co
 * [Spacing](#spacing)
 * [Comments](#comments)
 * [Code organization](#code-organization)
-* [General naming](#general-naming)
-* [Functions naming and arguments](#functions-naming-and-arguments)
+* [Naming](#naming)
 * [Closures](#closures)
 * [Types](#types)
-* [Mutability - let vs var](#mutability---let-vs-var)
+* [Mutability – `let` over `var`](#mutability---let-over-var)
 * [Optionals](#optionals)
-* [Static vs Dynamic](#static-vs-dynamic)
-* [Implicit getters on read-only computed properties and subscripts](https://github.com/netguru/swift-style-guide#implicit-getters-on-read-only-computed-properties-and-subscripts)
-* [Specify access control](#specify-access-control)
-* [Refer to self only when it’s required and necessary](#refer-to-self-only-when-its-required-and-necessary)
-* [Value semantics over reference semantics](#value-semantics-over-reference-semantics)
+* [Static vs dynamic code](#static-vs-dynamic-code)
+* [Implicit getters](#implicit-getters)
+* [Access control](#access-control)
+* [Explicit references to `self`](#explicit-references-to-self)
+* [Value types over reference types](#value-types-over-reference-types)
 * [Forbidden](#forbidden)
 
 ## Spacing
 
-Indent code with tabs, not spaces. Remember about ending file with new line.
+Indent code with tabs, not spaces. End files with an empty line.
 
-Vertical spaces should be used in long methods to separate its name from implementation, what improves readability. You may also want to use vertical spaces to separate logic within a function. Shorter methods (one or two lines) don't need such spacing.
+Vertical spaces should be used in long methods to separate its name from implementation. You may also want to use vertical spaces to separate logic within a function. Shorter methods (one or two lines) don't need such spacing.
 
 ## Comments
 
-Use comments to describe why something is written as it is, or working like it does. Remember that code should be self-documenting, so use comments only if necessary. If you decide to add comments, keep them up-to-date. Unmaintained comments should be removed.
+Use comments to describe why something is written as it is, or working like it does. Remember that code should be self-documenting, so use comments only if necessary.
+
+If you decide to add comments, keep them up-to-date. Unmaintained comments should be removed.
 
 ## Code organization
 
-Preferable code organization within a file:
+Source files should have the following organization.
 
 ```swift
+// 1. imports
+
+import MoneyKit
+
+// 2. classes, structs, enums
+
 class Wallet {
+
+    // 2.1. public, internal properties
+
+    let cards: [Card]
+    private(set) var cash: Cash
     
-    private(set) var cash: Double
-    let cards: [Card]?
+    // 2.2. private properties
     
-    private personID: Identification
+    unowned private let owner: Person
     
-    init(cash: Double, cards: [Card], identification: Identification) {
-        self.cash = cash
-        self.cards = cards
-        personID = identification
-    }
+    // 2.3. initializers
     
-    func canAffordTransaction(transaction: Transaction) -> Bool
+    init(cash: Cash, cards: [Card], owner: Person)
     
-    private func cardForCashAmount(amount: Double) -> Card
+    // 2.4. public, internal functions
+    
+    func affordsTransaction(transaction: Transaction) -> Bool
+    
+    // 2.5. private functions
+    
+    private func cardWithSuffiecientCash(cash: Cash) -> Card?
+    
 }
-    
+
+// 3. extensions, protocol implementations
+
 extension Wallet: Printable {
 
     var description: String {
-        return personID.firstName + " " + personID.lastName + " has " + String(cash)
+        return "\(owner.name) has \(cash) cash and \(cards.count) cards"
     }
+
 }
 ```
 
-Such organization helps others to reach important content earlier. It saves time, confusion and improves readability.
+Such organization helps others to reach important content earlier. It also saves time, confusion and improves readability.
 
-## General naming
+## Naming
 
-Names of classes, structs, enums, enum cases, typealiases, protocols and generic types should be capitalized. Generic types' names should start with letter `T`, when `U`, `V` and so on.
-
-Names should be meaningful and compact, written in camel case manner. Try to ask yourself whether the name of a type sufficiently explains its behavior. Meaningful naming is very important to other developers because they define some expectations about their own roles.
+Names should be meaningful and compact, written in camelCase. Try to ask yourself whether the name of a type sufficiently explains its behavior. Meaningful naming is very important to other developers because they define some expectations about their own roles.
 
 It is strongly misadvised to name suffix your types with words like `Manager`, `Helper` or `Utility` because they're meaningless and their role can be easily misinterpreted.
 
-## Function and argument naming
+### Generic types
+
+Names of classes, structs, enums, enum cases, typealiases, protocols and generic types should be capitalized. Generic types' names should start with letter `T`, when `U`, `V` and so on.
+
+### Functions and arguments
 
 Function names should be as descriptive and meaningful as possible. Try to express its intent in the name, by keeping it compact at the same time.
 
 Arguments should also be descriptive. Remember that you can use argument labels, which may be more meaningful to a user.
 
-The first argument's name can be a part of the function's name:
+The first argument's name can be a part of the function's name...
 
 ```swift
-func convertPoint(point: CGPoint, toCoordinateSystem system: CoordinateSystem) -> CGPoint
+func convertPoint(point: Point, fromView view: View) -> Point
 ```
 
-Or its label can be explicitly required:
+... or its label can be explicitly required.
 
 ```swift
-func convert(#point: CGPoint, toCoordinateSystem system: CoordinateSystem) -> CGPoint
+func convert(#point: Point, toView view: View) -> Point
 ```
 
 Use default values for arguments where a function expects any value or some specific value most of the time. If a particular argument is not required for a function, it's good to make it optional and `nil` by default.
-
-```swift
-func describe(#operation: Operation, includingOperationError error: NSError? = nil) -> String
-```
 
 ## Closures
 
@@ -110,93 +125,91 @@ If the last argument of a function is a closure, use trailing closure syntax.
 Trailing closure syntax should be used if a function accepts a closure as its last argument. If it's its only argument, parentheses may be ommited. Unused closure arguments should be replaced with `_` (or fully ommited if no arguments are used). Argument types should be inferred.
 
 ```swift
-func perform<T>(#operation: Operation<T>, completion: (T, NSError) -> Void)
+func executeRequest<T>(request: Request<T>, completion: (T, Error?) -> Void)
 
-perform(#operation: operation) { (result, _) in
-    ...
-}
+executeRequest(someRequest) { (result, _) in /* ... */ }
 ```
 
 Use implicit `return` in one-line closures with clear context.
 
 ```swift
-let users: [User] = ...
-
-users.filter { $0.name != nil }
+let numbers = [1, 2, 3, 4, 5]
+let even = filter(numbers) { $0 % 2 == 0 }
 ```
 
-Also, remember that global functions are closures and sometimes it's convenient to pass a function name as a closure:
+Also, remember that global functions are closures and sometimes it's convenient to pass a function name as a closure.
 
 ```swift
-func isPositive(number: Int) -> Bool {
-    return number > 0
-}
+func isPositive(number: Int) -> Bool
 
-let numbers = [-1, 2, 3, -4]
-
-let positive = numbers.filter(isPositive) // [2, 3]
+let numbers = [-1, 2, 3, -4, 5]
+let positive = filter(numbers, isPositive)
 ```
 
 ## Types
 
 Try to use native Swift types before you come up with your own. Every type can be extended, so sometimes instead of introducing new types, it's convenient to extend or alias existing ones.
 
-Remember that Objective-C classes that have native Swift equivalents are not automatically bridged, e.g. `NSString` is not implicitly bridged to `String` in the following example:
+Remember that Objective-C classes that have native Swift equivalents are not automatically bridged, e.g. `NSString` is not implicitly bridged to `String` in the following example.
 
 ```swift
-func inverse(string: String)
+func lowercase(string String) -> String
 
-let string: NSString = ...
+let string: NSString = /* ... */
 
-inverse(string) // compile error
-inverse(string as String) // no error 
+lowercase(string) // compile error
+lowercase(string as String) // no error
 ```
 
 Types should be inferred whenever possible. Don't duplicate type identifier if it can be resolved in compile time:
 
 ```swift
-let name = "text"
-var guides = [Guide]()
-var addressBook = [String: String]()
+// preferred
 
-// not preferred
-
-let name: String = "text"
-var guides: [Guide] = []
-var addressBook: [String: String] = [:]
+let name = "John Appleseed"
+let planets = [.Mars, .Saturn]
+let colors = ["red": 0xff0000, "green": 0x00ff00]
 ```
 
-Also, associate colon with type identifier:
-
 ```swift
-class MyView: UIView
-let color: UIColor
-
 // not preferred
 
-class MyView : UIView
-let color : UIColor
+let name: String = "Amanda Smith"
+let planets: [Planet] = [.Venus, .Earth]
+let colors: [String: UInt32] = ["blue": 0x0000ff, "white": 0xffffff]
 ```
 
-Typealiases should be short and meaningful:
+Also, associate colon with type identifier.
 
 ```swift
+// preferred
+
+class VideoArticle: Article
+let events: [Timestamp: Event]
+```
+
+```swift
+// not preferred
+
+class VideoArticle : Article
+let events : [Timestamp : Event]
+```
+
+Typealiases should be short and meaningful.
+
+```swift
+// preferred
+
 typealias MoneyAmount = Double
+```
 
-struct Item {
-    let price: MoneyAmount
-}
-
+```swift
 // not preferred
 
 typealias Money = Double
-
-struct Item {
-    let price: Money
-}
 ```
 
-## Mutability – `let` vs `var`
+## Mutability – `let` over `var`
 
 It's safer to assume that a variable is immutable, thus it's highly recommended to declare values as constants, using `let`. Immutable constants ensure their values will never change, which results in less error-prone code.
 
@@ -204,206 +217,176 @@ Mutable `var` variables should only be used when necessary, e.g. when you're abs
 
 ## Optionals
 
-Force-unwrapping should be avoided because it leads to less safe code and can cause unwanted crashes.
+Force unwrapping should be avoided as much as possible. Implicitly unwrapped optionals lead to less safe code and can cause unwanted crashes. Use optional chaining or `if-let` bindings to unwrap optional values.
 
 ```swift
-let result: Result<String>?
+let user: User? = findUserById(123)
 
-result?.print()
-
-// not preferred
-
-result!.print()
+if let user = user {
+    println("found user \(user.name) with id \(user.id)")
+}
 ```
 
-Implicitly unwrapped optionals should also be avoided. However, they can be useful in unit tests, where system under test should never be `nil`. There's no point executing the rest of the tests if one of them is written badly.
+Unwrapping several optionals in nested `if-let` statements is forbidden, as it leads to "pyramid of doom". Swift allows you to unwrap multiple optionals in one statement.
 
 ```swift
-var sut: System!
+let name: String?
+let age: Int?
+
+if let name = name, age = age where age >= 13 {
+    /* ... */
+}
+```
+
+However, implicitly unwrapped optionals can sometimes be useful. They may be used in unit tests, where system under test should never be `nil`. There's no point executing rest of the tests if one of them fails.
+
+```swift
+var sut: SystemUnderTest!
 
 beforeEach {
-    sut = System()
+    sut = /* ... */
 }
 
 afterEach {
     sut = nil
 }
 
-it ("should be running") {
-    sut.start()
-    expect(sut.isRunning).to(beTrue())
+it("should behave as expected") {
+    sut.run()
+    expect(sut.running).to(beTrue())
 }
 ```
 
-Unwrap optional value when it makes sense, e.g. when you need to make a bunch of operations on it:
+## Static vs. dynamic code
+
+Static code is code which logic and control from can be resolved at compile-time. Swift compiler is able to optimize predictable code to work better and faster. Try to make use of this feature and write as much static code as possible.
+
+On the other hand, dynamic code's control flow is resolved at run-time, which means it's not predictable and, as a result, can't be optimized by the compiler. Avoid using `@dynamic` and `@objc` attributes.
+
+## Implicit getters
+
+Read-only computed properties don't need an explicit getter, thus it can be ommited. This also applies to read-only subscripts.
 
 ```swift
-var button: UIButton?
+struct Person {
 
-if let button = button {
-    button.backgroundColor = UIColor.blackColor()
-    button.layer.cornerRadius = 5.0
-    button.layer.borderWidth = 1.0
-}
-```
-
-Otherwise use optional chaining because it's clear and safe:
-
-```swift
-button?.backgroundColor = UIColor.blackColor()
-```
-
-Unwrapping several optionals in nested `if-let` statements is forbidden. Swift allows you to unwrap multiple optionals in one statement:
-
-```swift
-var name: String?
-var birthDate: NSDate?
-
-if let name = name, birthDate = birthDate {
-    ...
-}
-```
-
-Functions should have optional return type if they may return `nil`:
-
-```swift
-func annotationOfType(type: AnnotationType) -> Annotation?
-```
-
-## Static vs Dynamic
-
-Static code is a code which state can be resolved in compile time. Swift compiler is able to optimize code that it knows how will work before executing it. Try make use of this feature and write as much static code as it can be, so it will perform better.
-
-Dynamic code is a code which state is resolved in runtime what means that it can’t be optimized by compiler since it doesn’t know the result or behavior of such code at compile time. Avoid using dynamic code like `@objc class`, unless you really need this feature.
-
-Try also to minimize dynamic dispatch as much as possible, since it can decrease performance as well:
-
-```swift
-protocol Generator {
-    var seed: Int { get }
-    func next() -> Int
-}
-
-class Uniform: Generator {
-    let seed = 5
-    func next() -> Int { ... }
-}
-
-struct Exponential: Generator {
-    let seed = 3
-    func next() -> Int { ... }
-}
-
-func random(generator: Generator, inRange range: (Int, Int)) -> Int { 
-    let next = generator.next()
-    ...
-}
-```
-
-Instead of:
-
-```swift
-
-class Generator {
-    let seed: Int
-    
-    init(seed: Int) {
-        self.seed = seed
-    }
-    
-    randomInRange(range: (Int, Int)) -> Int
-}
-
-class Uniform: Generator {
-    
-    init() {
-        super.init(seed: 5)
-    }
-}
-
-class Exponential: Generator {
-    
-    init() {
-        super.init(seed: 3)
-    }
-}
-```
-
-Please take a look at [Value semantics over reference semantics](#value-semantics-over-reference-semantics) section too.
-
-## Implicit getters on read-only computed properties and subscripts
-
-Read-only computed properties doesn’t need to have getter defined explicitly. It can be omitted. This also applies to read-only subscripts:
-
-```swift
-class Person {
     let height: Float
-    var weight: Float
+    let weight: Float
 
     var bmi: Float {
         return weight / (height * height)
     }
+    
 }
 ```
 
-## Specify access control
+## Access control
 
-Access control should be specified on a top-level of scope:
+Access control modifiers should be specified on a top-level scope.
 
 ```swift
-public extension Person {
-    func jump()
+public extension String {
+    var uppercaseString: String
 }
 ```
 
-Use access modifiers for functions, types and members only if it is necessary. Pay attention on variable access. Use private or private(set) appropriately. Don’t add access modifiers if they are already a default.
+Use access control modifiers only if necessary. Pay attention to variables. Use `private` or `private(set)` appropriately. Don't add modifiers if they are are already a default.
 
 ```swift
-extension Person {
-    func jump()
-}
-```
+// preferred
 
-Not preferred:
-
-```swift
-internal extension Person {
-    func jump()
-}
-```
-
-## Refer to self only when it’s required and necessary
-
-Refer to self only in closures or when context requires it:
-
-```swift
-UIView.animation(0.25) {
-    self.containerView.alpha = 0.0
+extension String {
+    var uppercaseString: String
 }
 ```
 
 ```swift
-init(title: String) {
-    self.title = title
+// not preferred
+
+internal extension String {
+    var uppercaseString: String
 }
 ```
 
-## Value semantics over reference semantics
+## Explicit references to `self`
 
-Value types are structs, enums and tuples. They are usually simpler than reference types and they are always being copied on assignment, when passing as arguments or in initialization. This means that values are independent instances what makes code simpler and safer, because they can’t be changed by other part of the app, like some other thread. Also let and var keywords work as expected.
+Explicit references to `self` should only take place in closures and when the language requires it.
+
+```swift
+struct Person {
+    
+    let firstName: String
+    let lastName: String
+    
+    var fullName: String {
+        return "\(firstName) \(lastName)"
+    }
+
+    init(firstName: String, lastName: String) {
+        self.firstName = firstName
+        self.lastName = lastName
+    }
+
+}
+```
+
+## Value types over reference types
+
+Value types, such as structs, enums and tuples are usually simpler than reference types (classes) and they're always passed by copying. This means they're independent thread-safe instances, which makes code simpler and safer. In addition, `let` and `var` work as expected.
 
 Value types are great for representing **data** in the app.
 
-On the other hand reference types are classes. There are several cases when you would like or should to use class. The first case is when you want to subclass Objective-C class, such as `UIView`. You will also have to use reference types to have shared, mutable state, or if you need a deinit.
+```swift
+struct Country {
+    let name: String
+    let capital: City
+}
+```
 
-Object types are great to represent **behavior** in the app.
+On the other hand, reference types, such as classes, are passed by referencing the same mutable instance in memory. There are several cases when classes should be preferred. The first case emerges when subclassing current Objective-C classes. The second one is when you need to use reference types with mutable state, or if you need to perform some actions on deinitialization.
 
-Remember that inheritance is not a good reason to use `class`, try with `protocol` instead (composition).
+Reference types are great to represent **behavior** in the app.
+
+```swift
+class FileStream {
+    let file: File
+    var currentPosition: StreamPosition
+}
+```
+
+Keep in mind that inheritance is not a sufficient argument to use classes. You should try to compose your types using protocols.
+
+```swift
+// preferred
+
+protocol Polygon {
+    var numberOfSides: Int { get }
+}
+
+struct Triangle: Polygon {
+    let numberOfSides = 3
+}
+```
+
+```swift
+// not preferred
+
+class Polygon {
+    let numberOfSides: Int
+    init(numberOfSides: Int)
+}
+
+class Trinagle: Polygon {
+    init() {
+        super.init(numberOfSides: 3)
+    }
+}
+```
 
 ## Forbidden
 
-`Class`, `struct`, `enum`, functions and typealiases should never have prefixes, because they are automatically prefixed by the name of module they’re contained in.
+Types should never have prefixes because their names are already implicitly mangled and prefixed by their module name.
 
-Semicolons are obfuscating and they should never be used. Statements can be separated by dropping each one to separate lines.
+Semicolons are obfuscative and should never be used. Statements can be distributed in different lines.
 
-Rewriting Swift standard library functionalities should never take place. Your code probably won’t be faster and can be confusing to other developers.
+Rewriting standard library functionalities should never take place. Your code will most probably be less optimized and more confusing to other developers.
